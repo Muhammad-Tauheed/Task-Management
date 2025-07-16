@@ -55,21 +55,24 @@ const TasksDetail = () => {
   ) => {
     try {
       setLoading(true);
+
       const response = await axiosInstance.get(
         `/task/get-all?page=${page}&limit=10&status=${status}`
       );
-      setTasks(response.data.tasks);
-      setPagination(
-        response.data.pagination || {
-          page: response.data.page || page,
-          limit: response.data.limit || 10,
-          total: response.data.total || response.data.tasks.length,
-          pages:
-            response.data.pages ||
-            Math.ceil(response.data.total / response.data.limit) ||
-            1,
-        }
-      );
+
+      const { data, page: currentPage, totalPages, totalTasks } = response.data;
+
+      // ✅ Set tasks array
+      setTasks(data || []);
+
+      // ✅ Set pagination info
+      setPagination({
+        page: currentPage || 1,
+        limit: 10,
+        total: totalTasks || 0,
+        pages: totalPages || 1,
+      });
+
       setError(null);
     } catch (err) {
       setError("Failed to fetch tasks. Please try again later.");

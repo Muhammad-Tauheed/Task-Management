@@ -79,7 +79,6 @@ const RegisterPage = () => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
@@ -106,7 +105,6 @@ const RegisterPage = () => {
       );
 
       if (response.data.success) {
-        // Save token and user data
         localStorage.setItem("token", response.data.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.data.user));
 
@@ -118,11 +116,9 @@ const RegisterPage = () => {
         router.push("/tasks");
       }
     } catch (error: any) {
-      // Extract error message from the API response
       const errorMessage =
         error.response?.data?.message || "Error during registration";
 
-      // If it's an existing user error, set it specifically in the email field
       if (errorMessage.includes("already exists")) {
         setErrors((prev) => ({
           ...prev,
@@ -130,7 +126,6 @@ const RegisterPage = () => {
         }));
       }
 
-      // Show error toast
       toast.error(errorMessage, {
         duration: 4000,
         position: "top-center",
@@ -142,7 +137,6 @@ const RegisterPage = () => {
         },
       });
 
-      // Add a shake animation to the form
       const form = document.querySelector("form");
       form?.classList.add("animate-shake");
       setTimeout(() => {
@@ -174,23 +168,23 @@ const RegisterPage = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <h1 className="text-5xl font-bold mb-6 leading-tight">
-              Join Our Financial Community
+              Join Our Task Management Community
             </h1>
             <p className="text-lg text-gray-300 mb-8">
-              Create your account today and start your journey towards better
-              financial management with our powerful dashboard.
+              Create your account today and start organizing your tasks with our
+              intuitive platform.
             </p>
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4">
-                <h3 className="text-xl font-semibold mb-2">Secure Platform</h3>
+                <h3 className="text-xl font-semibold mb-2">Task Management</h3>
                 <p className="text-gray-300">
-                  Your data is protected with industry-standard encryption
+                  Create, edit, and track tasks with ease
                 </p>
               </div>
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4">
-                <h3 className="text-xl font-semibold mb-2">Easy Setup</h3>
+                <h3 className="text-xl font-semibold mb-2">Status Control</h3>
                 <p className="text-gray-300">
-                  Get started in minutes with our intuitive interface
+                  Seamlessly update task statuses to stay productive
                 </p>
               </div>
             </div>
@@ -216,9 +210,7 @@ const RegisterPage = () => {
               >
                 Create Account
               </motion.h2>
-              <p className="text-gray-400">
-                Start managing your finances today
-              </p>
+              <p className="text-gray-400">Start managing your tasks today</p>
             </div>
 
             <form className="space-y-6" onSubmit={handleSubmit}>
@@ -252,7 +244,7 @@ const RegisterPage = () => {
                   )}
                 </div>
 
-                {/* Email Input with Enhanced Error Display */}
+                {/* Email Input */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <FiMail className="h-5 w-5 text-gray-400" />

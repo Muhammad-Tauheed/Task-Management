@@ -125,25 +125,27 @@ const LoginPage = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <h1 className="text-5xl font-bold mb-6 leading-tight">
-              Welcome to Your Financial Dashboard
+              Welcome to Your Task Management Hub
             </h1>
             <p className="text-lg text-gray-300 mb-8">
-              Track your expenses, monitor your income, and take control of your
-              financial journey with our powerful dashboard.
+              Organize your tasks, track progress, and stay productive with our
+              intuitive task management platform.
             </p>
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4">
-                <h3 className="text-xl font-semibold mb-2">Smart Analytics</h3>
+                <h3 className="text-xl font-semibold mb-2">
+                  Task Organization
+                </h3>
                 <p className="text-gray-300">
-                  Visualize your spending patterns with intuitive charts
+                  Easily create and categorize tasks with pending or completed
+                  statuses
                 </p>
               </div>
               <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4">
-                <h3 className="text-xl font-semibold mb-2">
-                  Real-time Tracking
-                </h3>
+                <h3 className="text-xl font-semibold mb-2">Status Updates</h3>
                 <p className="text-gray-300">
-                  Monitor your transactions as they happen
+                  Update task statuses in real-time to keep your workflow on
+                  track
                 </p>
               </div>
             </div>
@@ -170,7 +172,7 @@ const LoginPage = () => {
                 Sign In
               </motion.h2>
               <p className="text-gray-400">
-                Access your dashboard to manage your finances
+                Access your tasks to stay organized and productive
               </p>
             </div>
 

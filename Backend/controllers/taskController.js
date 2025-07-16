@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 
 exports.createTask = async (req, res) => {
   try {
+    const userId = req.user._id;
     const { title, description } = req.body;
 
     if (!title || !description) {
@@ -11,7 +12,12 @@ exports.createTask = async (req, res) => {
         message: "Title and description are required",
       });
     }
-    const task = await Task.create({ title, description });
+
+    const task = await Task.create({
+      user: userId,
+      title: title.trim(),
+      description: description.trim(),
+    });
 
     res.status(201).json({
       success: true,
@@ -28,12 +34,61 @@ exports.createTask = async (req, res) => {
   }
 };
 
+// exports.getAllTasks = async (req, res) => {
+//   try {
+//     const status = req.query.status || "pending";
+//     const userId = req.user._id;
+
+//     const tasks = await Task.aggregate([
+//       { $match: { status } },
+//       { $sort: { createdAt: -1 } },
+//       {
+//         $project: {
+//           title: 1,
+//           description: 1,
+//           status: 1,
+//           createdAt: 1,
+//           updatedAt: 1,
+//         },
+//       },
+//     ]);
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Tasks fetched successfully",
+//       tasks,
+//     });
+//   } catch (error) {
+//     console.log("Error getting all tasks", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to get all tasks",
+//       error: error.message,
+//     });
+//   }
+// };
+
 exports.getAllTasks = async (req, res) => {
   try {
-    const status = req.query.status || "pending";
+    const userId = req.user._id;
+    const { status, page = 1, limit = 10 } = req.query;
 
+    // Convert to numbers
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const limitNum = parseInt(limit);
+
+    // Build match filter
+    const matchStage = {
+      user: new mongoose.Types.ObjectId(userId),
+    };
+
+    if (status) {
+      matchStage.status = status; // "pending" or "completed"
+    }
+
+    // Aggregation pipeline
     const tasks = await Task.aggregate([
-      { $match: { status } },
+      { $match: matchStage },
       { $sort: { createdAt: -1 } },
       {
         $project: {
@@ -44,18 +99,25 @@ exports.getAllTasks = async (req, res) => {
           updatedAt: 1,
         },
       },
+      { $skip: skip },
+      { $limit: limitNum },
     ]);
+
+    // Optional: count total for frontend pagination
+    const totalCount = await Task.countDocuments(matchStage);
 
     res.status(200).json({
       success: true,
-      message: "Tasks fetched successfully",
-      tasks,
+      page: parseInt(page),
+      totalPages: Math.ceil(totalCount / limitNum),
+      totalTasks: totalCount,
+      data: tasks,
     });
   } catch (error) {
-    console.log("Error getting all tasks", error);
+    console.error("Error fetching tasks:", error.message);
     res.status(500).json({
       success: false,
-      message: "Failed to get all tasks",
+      message: "Failed to fetch tasks",
       error: error.message,
     });
   }
