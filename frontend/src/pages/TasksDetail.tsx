@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import CreateNewTask from "../components/CreateNewTask";
 import ConfirmationModal from "../components/ConfirmationModal";
 import axiosInstance from "@/lib/axiosInstance";
@@ -21,6 +22,7 @@ interface PaginationData {
 }
 
 const TasksDetail = () => {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,10 +64,7 @@ const TasksDetail = () => {
 
       const { data, page: currentPage, totalPages, totalTasks } = response.data;
 
-      // ✅ Set tasks array
       setTasks(data || []);
-
-      // ✅ Set pagination info
       setPagination({
         page: currentPage || 1,
         limit: 10,
@@ -153,15 +152,26 @@ const TasksDetail = () => {
     setIsModalOpen(true);
   };
 
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("token");
+      toast.success("Logged out successfully!");
+      router.push("/");
+    } catch (err) {
+      console.error("Error during logout:", err);
+      toast.error("Failed to log out. Please try again.");
+    }
+  };
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl">
         {/* Tab Navigation */}
-        <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center">
-          <div className="flex space-x-4">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
             <button
               onClick={() => setActiveTab("pending")}
-              className={`px-6 py-3 rounded-lg text-base font-semibold transition-all duration-300 transform hover:scale-105 ${
+              className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-semibold transition-all duration-300 transform hover:scale-105 ${
                 activeTab === "pending"
                   ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
                   : "bg-white/10 text-gray-300 hover:bg-white/20"
@@ -171,7 +181,7 @@ const TasksDetail = () => {
             </button>
             <button
               onClick={() => setActiveTab("completed")}
-              className={`px-6 py-3 rounded-lg text-base font-semibold transition-all duration-300 transform hover:scale-105 ${
+              className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-semibold transition-all duration-300 transform hover:scale-105 ${
                 activeTab === "completed"
                   ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
                   : "bg-white/10 text-gray-300 hover:bg-white/20"
@@ -180,56 +190,80 @@ const TasksDetail = () => {
               Completed Tasks
             </button>
           </div>
-          <button
-            onClick={() => openTaskModal()}
-            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5 mr-2"
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+            <button
+              onClick={() => openTaskModal()}
+              className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-            Add Task
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
+              Add Task
+            </button>
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h3a3 3 0 013 3v1"
+                />
+              </svg>
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Loading and Error States */}
         {loading && (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+          <div className="flex justify-center items-center py-6 sm:py-8">
+            <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-400"></div>
           </div>
         )}
 
-        {error && <div className="text-red-400 text-center py-8">{error}</div>}
+        {error && (
+          <div className="text-red-400 text-center py-6 sm:py-8">{error}</div>
+        )}
 
         {/* Table Section with Scroll */}
         {!loading && !error && (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[40rem]">
               <thead>
                 <tr className="bg-white/5">
-                  <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">
+                  <th className="text-left py-2 sm:py-3 px-2 sm:px-6 text-xs sm:text-sm font-medium text-gray-400">
                     Title
                   </th>
-                  <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">
+                  <th className="text-left py-2 sm:py-3 px-2 sm:px-6 text-xs sm:text-sm font-medium text-gray-400">
                     Description
                   </th>
-                  <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">
+                  <th className="text-left py-2 sm:py-3 px-2 sm:px-6 text-xs sm:text-sm font-medium text-gray-400">
                     Created At
                   </th>
-                  <th className="text-center py-3 px-6 text-sm font-medium text-gray-400">
+                  <th className="text-center py-2 sm:py-3 px-2 sm:px-6 text-xs sm:text-sm font-medium text-gray-400">
                     Status
                   </th>
-                  <th className="text-center py-3 px-6 text-sm font-medium text-gray-400 w-32">
+                  <th className="text-center py-2 sm:py-3 px-2 sm:px-6 text-xs sm:text-sm font-medium text-gray-400 w-20 sm:w-32">
                     Actions
                   </th>
                 </tr>
@@ -240,18 +274,18 @@ const TasksDetail = () => {
                     key={task._id}
                     className="hover:bg-white/5 transition-colors"
                   >
-                    <td className="py-3 px-6 text-sm text-gray-300 whitespace-nowrap">
+                    <td className="py-2 sm:py-3 px-2 sm:px-6 text-xs sm:text-sm text-gray-300 whitespace-nowrap">
                       {task.title}
                     </td>
-                    <td className="py-3 px-6 text-sm text-gray-300">
+                    <td className="py-2 sm:py-3 px-2 sm:px-6 text-xs sm:text-sm text-gray-300">
                       {task.description || "-"}
                     </td>
-                    <td className="py-3 px-6 text-sm text-gray-300 whitespace-nowrap">
+                    <td className="py-2 sm:py-3 px-2 sm:px-6 text-xs sm:text-sm text-gray-300 whitespace-nowrap">
                       {new Date(task.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="py-3 px-6 text-center">
+                    <td className="py-2 sm:py-3 px-2 sm:px-6 text-center">
                       <span
-                        className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
+                        className={`inline-flex px-1.5 sm:px-2.5 py-1 text-xs font-medium rounded-full ${
                           task.status === "pending"
                             ? "text-yellow-400 bg-yellow-500/20"
                             : "text-green-400 bg-green-500/20"
@@ -261,20 +295,20 @@ const TasksDetail = () => {
                           task.status.slice(1)}
                       </span>
                     </td>
-                    <td className="py-3 px-6 text-center flex justify-center gap-2">
+                    <td className="py-2 sm:py-3 px-2 sm:px-6 text-center flex justify-center gap-1 sm:gap-2">
                       {activeTab !== "completed" && (
                         <>
                           <button
                             onClick={() => openTaskModal(task)}
-                            className="inline-flex items-center justify-center w-8 h-8 text-blue-400 hover:text-white bg-transparent hover:bg-blue-500/20 rounded-lg transition-colors"
+                            className="inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 text-blue-400 hover:text-white bg-transparent hover:bg-blue-500/20 rounded-lg transition-colors"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
-                              strokeWidth={1.5}
+                              strokeWidth={1}
                               stroke="currentColor"
-                              className="w-5 h-5"
+                              className="w-3 h-3 sm:w-5 sm:h-5"
                             >
                               <path
                                 strokeLinecap="round"
@@ -294,15 +328,15 @@ const TasksDetail = () => {
                                   : "pending"
                               )
                             }
-                            className="inline-flex items-center justify-center w-8 h-8 text-green-400 hover:text-white bg-transparent hover:bg-green-500/20 rounded-lg transition-colors"
+                            className="inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 text-green-400 hover:text-white bg-transparent hover:bg-green-500/20 rounded-lg transition-colors"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
-                              strokeWidth={1.5}
+                              strokeWidth={1}
                               stroke="currentColor"
-                              className="w-5 h-5"
+                              className="w-3 h-3 sm:w-5 sm:h-5"
                             >
                               <path
                                 strokeLinecap="round"
@@ -317,15 +351,15 @@ const TasksDetail = () => {
                         onClick={() =>
                           openConfirmationModal("delete", task._id, task.title)
                         }
-                        className="inline-flex items-center justify-center w-8 h-8 text-red-400 hover:text-white bg-transparent hover:bg-red-500/20 rounded-lg transition-colors"
+                        className="inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 text-red-400 hover:text-white bg-transparent hover:bg-red-500/20 rounded-lg transition-colors"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
-                          strokeWidth={1.5}
+                          strokeWidth={1}
                           stroke="currentColor"
-                          className="w-5 h-5"
+                          className="w-3 h-3 sm:w-5 sm:h-5"
                         >
                           <path
                             strokeLinecap="round"
@@ -344,17 +378,17 @@ const TasksDetail = () => {
 
         {/* Pagination */}
         {!loading && !error && tasks?.length > 0 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-white/10">
-            <div className="text-sm text-gray-400">
+          <div className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-t border-white/10">
+            <div className="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-0">
               Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
               {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
               of {pagination.total} tasks
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2">
               <button
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page === 1}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200 
+                className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 
                         ${
                           pagination.page === 1
                             ? "bg-white/5 text-gray-500 cursor-not-allowed"
@@ -368,7 +402,7 @@ const TasksDetail = () => {
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200 
+                    className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 
                           ${
                             pagination.page === page
                               ? "bg-blue-500/20 text-blue-400"
@@ -382,7 +416,7 @@ const TasksDetail = () => {
               <button
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page === pagination.pages}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200 
+                className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 
                         ${
                           pagination.page === pagination.pages
                             ? "bg-white/5 text-gray-500 cursor-not-allowed"
